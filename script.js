@@ -107,7 +107,16 @@ function renderModules() {
           saveModules();
         };
 
-        subtaskEl.append(subCheck, subText);
+        const deleteSubBtn = document.createElement("button");
+        deleteSubBtn.innerHTML = "❌";
+        deleteSubBtn.className = "delete-btn";
+        deleteSubBtn.onclick = () => {
+          task.subtasks.splice(subIndex, 1);
+          saveModules();
+          renderModules();
+        };
+
+        subtaskEl.append(subCheck, subText, deleteSubBtn);
         taskWrapper.appendChild(subtaskEl);
       });
 

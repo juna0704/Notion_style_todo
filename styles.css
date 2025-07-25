@@ -22,8 +22,13 @@ button:hover {
 }
 .delete-btn {
   background: transparent;
-  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  color: red;
+  font-size: 14px;
+  margin-left: 5px;
 }
+
 .module {
   border: 1px solid #999;
   border-radius: 10px;
@@ -40,10 +45,11 @@ body.dark .module {
   margin-bottom: 10px;
 }
 .module-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   flex: 1;
   margin-right: 10px;
+  border: none;
 }
 .task-wrapper {
   margin-left: 10px;
@@ -53,28 +59,37 @@ body.dark .module {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
+  border: none;
 }
 .task-text {
-  font-size: 16px;
+  font-size: 18px;
   margin: 0 10px;
   flex: 1;
+  border: none;
+  border-bottom: 1px solid #999;
+  padding-bottom: 2px;
 }
 .subtask {
   display: flex;
   align-items: center;
   margin-left: 30px;
   margin-top: 5px;
+  /* background-color: #2a2a2a; */
 }
 .subtask-text {
   font-size: 14px;
   margin-left: 10px;
   flex: 1;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 2px;
 }
 .task-input {
   width: 100%;
   margin-top: 10px;
   padding: 5px;
   font-size: 15px;
+  border: none;
 }
 .done {
   text-decoration: line-through;
