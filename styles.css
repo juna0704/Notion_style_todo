@@ -1,0 +1,82 @@
+body {
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+  margin: 20px;
+  color: #111;
+  transition: 0.3s ease-in-out;
+}
+body.dark {
+  background-color: #1e1e1e;
+  color: #eee;
+}
+button {
+  margin-left: 5px;
+  padding: 4px 8px;
+  border: none;
+  background-color: #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #ccc;
+}
+.delete-btn {
+  background: transparent;
+  font-size: 18px;
+}
+.module {
+  border: 1px solid #999;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  background-color: #fff;
+}
+body.dark .module {
+  background-color: #2a2a2a;
+}
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.module-title {
+  font-size: 20px;
+  font-weight: bold;
+  flex: 1;
+  margin-right: 10px;
+}
+.task-wrapper {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+.task {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.task-text {
+  font-size: 16px;
+  margin: 0 10px;
+  flex: 1;
+}
+.subtask {
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+  margin-top: 5px;
+}
+.subtask-text {
+  font-size: 14px;
+  margin-left: 10px;
+  flex: 1;
+}
+.task-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 15px;
+}
+.done {
+  text-decoration: line-through;
+  color: gray;
+}
