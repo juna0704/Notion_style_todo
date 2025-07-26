@@ -4,137 +4,237 @@
   --text-light: #111;
   --text-dark: #eee;
   --card-light: #fff;
-  --card-dark: #2a2a2a;
+  --card-dark: #23272f;
   --accent: #007acc;
-  --subtle: #ddd;
-  --border: #999;
+  --subtle: #e2e6ea;
+  --border: #bbb;
+  --delete: #e74c3c;
+}
+* {
+  box-sizing: border-box;
 }
 
 body {
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   background-color: var(--bg-light);
   color: var(--text-light);
-  margin: 20px;
-  transition: 0.3s ease-in-out;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
 }
 body.dark {
   background-color: var(--bg-dark);
   color: var(--text-dark);
 }
-
+header.header {
+  padding: 16px 0;
+  background: transparent;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+.controls {
+  margin-top: 12px;
+  display: flex;
+  gap: 7px;
+}
 button {
-  margin-left: 5px;
-  padding: 4px 8px;
+  padding: 6px 14px;
+  font-size: 1rem;
   border: none;
   background-color: var(--subtle);
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  outline: none;
 }
-button:hover {
-  background-color: #ccc;
+button:hover,
+button:focus {
+  background-color: var(--accent);
+  color: white;
+  box-shadow: 0 0 4px 1px var(--accent);
 }
 .delete-btn {
+  color: var(--delete);
   background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #e74c3c;
-  font-size: 14px;
-  margin-left: 5px;
 }
-
+.delete-btn:hover,
+.delete-btn:focus {
+  background: #ffeaea;
+  color: #c0392b;
+}
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2vw;
+}
+.modules-container {
+  margin-top: 12px;
+}
+/* Module appearance */
 .module {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 15px;
-  margin: 20px 0;
-  background-color: var(--card-light);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 22px 0;
+  background: var(--card-light);
   width: 100%;
+  box-shadow: 0 2px 12px rgba(30, 30, 70, 0.07);
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.3s;
+  position: relative;
 }
 body.dark .module {
-  background-color: var(--card-dark);
+  background: var(--card-dark);
+  border-color: #2b3c54;
 }
-
+.module:hover {
+  box-shadow: 0 4px 18px rgba(54, 87, 255, 0.08);
+  border-color: var(--accent);
+}
+/* Drag-and-drop highlight */
+.module.dragover,
+.task-wrapper.dragover {
+  border: 2.5px dashed var(--accent) !important;
+  background: rgba(0, 122, 204, 0.06);
+}
+.task-wrapper.dragover {
+  background: rgba(0, 122, 204, 0.07);
+}
 .module-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 17px;
 }
 .module-title {
-  font-size: 24px;
+  font-size: 1.4rem;
   font-weight: bold;
   flex: 1;
-  margin-right: 10px;
-  background: transparent;
+  min-width: 0;
+  margin-right: 12px;
   border: none;
+  background: transparent;
   color: inherit;
+  transition: border-bottom 0.2s;
 }
 .module-title:focus {
   outline: none;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
 }
-
-.task-wrapper {
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
-.task {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-.task-text {
-  font-size: 18px;
-  margin: 0 10px;
-  flex: 1;
-  border: none;
-  background: transparent;
-  border-bottom: 1px solid #999;
-  padding-bottom: 2px;
-  color: inherit;
-}
-.task-text:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.subtask {
-  display: flex;
-  align-items: center;
-  margin-left: 30px;
-  margin-top: 5px;
-}
-.subtask-text {
-  font-size: 14px;
-  margin-left: 10px;
-  flex: 1;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 2px;
-  color: inherit;
-}
-.subtask-text:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
 .task-input {
   width: 100%;
-  margin-top: 15px;
-  padding: 8px 10px;
-  font-size: 15px;
-  border: none;
-  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom: 2px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
   background-color: #eee;
+  transition: background 0.2s;
 }
 body.dark .task-input {
   background-color: #444;
   color: var(--text-dark);
 }
-
+.task-input:focus {
+  outline: 2px solid var(--accent);
+  background: #e8f1fa;
+}
+body.dark .task-input:focus {
+  background: #253148;
+}
+.task-wrapper {
+  margin-left: 10px;
+  margin-bottom: 12px;
+  background: transparent;
+  border-radius: 6px;
+  transition: background 0.2s;
+  padding-bottom: 2px;
+  padding-right: 2px;
+}
+.task {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.task-text {
+  font-size: 1.05rem;
+  margin: 0 10px;
+  flex: 1;
+  border: none;
+  background: transparent;
+  min-width: 30px;
+  border-bottom: 1.5px solid #cacaca;
+  padding-bottom: 1px;
+  color: inherit;
+  transition: border-color 0.2s;
+  overflow-x: auto;
+}
+.task-text:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #e0f0ff;
+}
+body.dark .task-text:focus {
+  background: #222b34;
+}
+.subtask {
+  display: flex;
+  align-items: center;
+  margin-left: 35px;
+  margin-top: 4px;
+}
+.subtask-text {
+  font-size: 0.9rem;
+  margin-left: 8px;
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1.2px solid #d2d4d8;
+  padding-bottom: 1px;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+.subtask-text:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #f6fbff;
+}
+body.dark .subtask-text:focus {
+  background: #181a1b;
+}
+input[type="checkbox"] {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 6px;
+  accent-color: var(--accent);
+  vertical-align: middle;
+}
 .done {
   text-decoration: line-through;
-  color: gray;
+  color: #858585;
+}
+@media (max-width: 600px) {
+  main,
+  .header {
+    max-width: 98vw;
+    padding: 0 4vw;
+  }
+  .module-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .task-text,
+  .task-input,
+  .module-title {
+    font-size: 1.07rem;
+  }
 }

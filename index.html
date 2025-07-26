@@ -7,13 +7,31 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="header">
-      <button id="addModuleBtn">➕ Add Module</button>
-      <button id="toggleThemeBtn">🌓 Toggle Theme</button>
-      <button id="exportBtn">⬇️ Export .md</button>
-    </div>
-    <div id="modules" class="modules-container"></div>
-
+    <header class="header" role="banner">
+      <h1>Notion-style ToDo</h1>
+      <div class="controls">
+        <button id="addModuleBtn" aria-label="Add Module" title="Add Module">
+          ➕ Add Module
+        </button>
+        <button
+          id="toggleThemeBtn"
+          aria-label="Toggle Theme"
+          title="Toggle light/dark theme"
+        >
+          🌓 Toggle Theme
+        </button>
+        <button
+          id="exportBtn"
+          aria-label="Export as Markdown"
+          title="Export as Markdown"
+        >
+          ⬇️ Export .md
+        </button>
+      </div>
+    </header>
+    <main>
+      <div id="modules" class="modules-container" aria-live="polite"></div>
+    </main>
     <script src="script.js"></script>
   </body>
 </html>

@@ -4,13 +4,17 @@ const toggleThemeBtn = document.getElementById("toggleThemeBtn");
 const exportBtn = document.getElementById("exportBtn");
 
 let modules = JSON.parse(localStorage.getItem("modules")) || [];
+// Patch legacy data for missing subtasks array
+modules.forEach((mod) =>
+  (mod.tasks || []).forEach((t) => {
+    if (!Array.isArray(t.subtasks)) t.subtasks = [];
+  })
+);
 
-// Save modules to localStorage
 function saveModules() {
   localStorage.setItem("modules", JSON.stringify(modules));
 }
 
-// Render all modules and their tasks/subtasks
 function renderModules() {
   modulesContainer.innerHTML = "";
 
@@ -20,21 +24,19 @@ function renderModules() {
     moduleEl.draggable = true;
     moduleEl.dataset.index = modIndex;
 
-    // === Module Drag Events ===
+    // Module Drag events
     moduleEl.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("moduleIndex", modIndex);
     });
-
     moduleEl.addEventListener("dragover", (e) => {
       e.preventDefault();
-      moduleEl.style.border = "2px dashed var(--accent)";
+      moduleEl.classList.add("dragover");
     });
-
     moduleEl.addEventListener("dragleave", () => {
-      moduleEl.style.border = "";
+      moduleEl.classList.remove("dragover");
     });
-
     moduleEl.addEventListener("drop", (e) => {
+      moduleEl.classList.remove("dragover");
       const fromIndex = +e.dataTransfer.getData("moduleIndex");
       const toIndex = +moduleEl.dataset.index;
       if (fromIndex !== toIndex) {
@@ -45,7 +47,7 @@ function renderModules() {
       }
     });
 
-    // === Module Header ===
+    // Module header
     const headerEl = document.createElement("div");
     headerEl.className = "module-header";
 
@@ -60,6 +62,7 @@ function renderModules() {
 
     const deleteModuleBtn = document.createElement("button");
     deleteModuleBtn.className = "delete-btn";
+    deleteModuleBtn.title = "Delete Module";
     deleteModuleBtn.innerHTML = "🗑️";
     deleteModuleBtn.onclick = () => {
       modules.splice(modIndex, 1);
@@ -71,33 +74,30 @@ function renderModules() {
     headerEl.appendChild(deleteModuleBtn);
     moduleEl.appendChild(headerEl);
 
-    // === Tasks ===
+    // Tasks
     mod.tasks.forEach((task, taskIndex) => {
       const taskWrapper = document.createElement("div");
       taskWrapper.className = "task-wrapper";
       taskWrapper.draggable = true;
       taskWrapper.dataset.index = taskIndex;
 
-      // Drag Task
+      // Task Drag events
       taskWrapper.addEventListener("dragstart", (e) => {
         e.dataTransfer.setData("taskFrom", taskIndex);
         e.dataTransfer.setData("moduleIndex", modIndex);
       });
-
       taskWrapper.addEventListener("dragover", (e) => {
         e.preventDefault();
-        taskWrapper.style.border = "1px dashed var(--accent)";
+        taskWrapper.classList.add("dragover");
       });
-
       taskWrapper.addEventListener("dragleave", () => {
-        taskWrapper.style.border = "";
+        taskWrapper.classList.remove("dragover");
       });
-
       taskWrapper.addEventListener("drop", (e) => {
+        taskWrapper.classList.remove("dragover");
         const from = +e.dataTransfer.getData("taskFrom");
         const moduleIdx = +e.dataTransfer.getData("moduleIndex");
         const to = +taskWrapper.dataset.index;
-
         if (moduleIdx === modIndex && from !== to) {
           const [movedTask] = modules[modIndex].tasks.splice(from, 1);
           modules[modIndex].tasks.splice(to, 0, movedTask);
@@ -106,7 +106,7 @@ function renderModules() {
         }
       });
 
-      // === Task UI ===
+      // Task row
       const taskEl = document.createElement("div");
       taskEl.className = "task";
 
@@ -122,7 +122,7 @@ function renderModules() {
       const taskText = document.createElement("input");
       taskText.type = "text";
       taskText.value = task.text;
-      taskText.className = `task-text ${task.done ? "done" : ""}`;
+      taskText.className = `task-text${task.done ? " done" : ""}`;
       taskText.oninput = (e) => {
         task.text = e.target.value;
         saveModules();
@@ -140,6 +140,7 @@ function renderModules() {
 
       const deleteTaskBtn = document.createElement("button");
       deleteTaskBtn.innerHTML = "❌";
+      deleteTaskBtn.title = "Delete Task";
       deleteTaskBtn.onclick = () => {
         mod.tasks.splice(taskIndex, 1);
         saveModules();
@@ -149,7 +150,7 @@ function renderModules() {
       taskEl.append(checkbox, taskText, addSubtaskBtn, deleteTaskBtn);
       taskWrapper.appendChild(taskEl);
 
-      // === Subtasks ===
+      // Subtasks
       task.subtasks = task.subtasks || [];
       task.subtasks.forEach((sub, subIndex) => {
         const subtaskEl = document.createElement("div");
@@ -167,7 +168,7 @@ function renderModules() {
         const subText = document.createElement("input");
         subText.type = "text";
         subText.value = sub.text;
-        subText.className = `subtask-text ${sub.done ? "done" : ""}`;
+        subText.className = `subtask-text${sub.done ? " done" : ""}`;
         subText.oninput = (e) => {
           sub.text = e.target.value;
           saveModules();
@@ -176,6 +177,7 @@ function renderModules() {
         const subDelete = document.createElement("button");
         subDelete.className = "delete-btn";
         subDelete.textContent = "✖";
+        subDelete.title = "Delete Subtask";
         subDelete.onclick = () => {
           task.subtasks.splice(subIndex, 1);
           saveModules();
@@ -189,7 +191,7 @@ function renderModules() {
       moduleEl.appendChild(taskWrapper);
     });
 
-    // === Add Task Input ===
+    // Add Task Input
     const newTaskInput = document.createElement("input");
     newTaskInput.type = "text";
     newTaskInput.placeholder = "New task...";
@@ -211,25 +213,22 @@ function renderModules() {
   });
 }
 
-// === Button Handlers ===
+// Button Handlers
 addModuleBtn.onclick = () => {
   modules.push({ name: "New Module", tasks: [] });
   saveModules();
   renderModules();
 };
-
 toggleThemeBtn.onclick = () => {
   document.body.classList.toggle("dark");
 };
-
 exportBtn.onclick = () => {
   let content = "# Notion-style ToDo\n\n";
   modules.forEach((mod) => {
     content += `## ${mod.name}\n`;
     mod.tasks.forEach((task) => {
       content += `- [${task.done ? "x" : " "}] ${task.text}\n`;
-      task.subtasks = task.subtasks || [];
-      task.subtasks.forEach((sub) => {
+      (task.subtasks || []).forEach((sub) => {
         content += `  - [${sub.done ? "x" : " "}] ${sub.text}\n`;
       });
     });
