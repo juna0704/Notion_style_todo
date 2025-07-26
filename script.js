@@ -5,16 +5,47 @@ const exportBtn = document.getElementById("exportBtn");
 
 let modules = JSON.parse(localStorage.getItem("modules")) || [];
 
+// Save modules to localStorage
 function saveModules() {
   localStorage.setItem("modules", JSON.stringify(modules));
 }
 
+// Render all modules and their tasks/subtasks
 function renderModules() {
   modulesContainer.innerHTML = "";
+
   modules.forEach((mod, modIndex) => {
     const moduleEl = document.createElement("div");
     moduleEl.className = "module";
+    moduleEl.draggable = true;
+    moduleEl.dataset.index = modIndex;
 
+    // === Module Drag Events ===
+    moduleEl.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("moduleIndex", modIndex);
+    });
+
+    moduleEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      moduleEl.style.border = "2px dashed var(--accent)";
+    });
+
+    moduleEl.addEventListener("dragleave", () => {
+      moduleEl.style.border = "";
+    });
+
+    moduleEl.addEventListener("drop", (e) => {
+      const fromIndex = +e.dataTransfer.getData("moduleIndex");
+      const toIndex = +moduleEl.dataset.index;
+      if (fromIndex !== toIndex) {
+        const [moved] = modules.splice(fromIndex, 1);
+        modules.splice(toIndex, 0, moved);
+        saveModules();
+        renderModules();
+      }
+    });
+
+    // === Module Header ===
     const headerEl = document.createElement("div");
     headerEl.className = "module-header";
 
@@ -40,10 +71,42 @@ function renderModules() {
     headerEl.appendChild(deleteModuleBtn);
     moduleEl.appendChild(headerEl);
 
+    // === Tasks ===
     mod.tasks.forEach((task, taskIndex) => {
       const taskWrapper = document.createElement("div");
       taskWrapper.className = "task-wrapper";
+      taskWrapper.draggable = true;
+      taskWrapper.dataset.index = taskIndex;
 
+      // Drag Task
+      taskWrapper.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("taskFrom", taskIndex);
+        e.dataTransfer.setData("moduleIndex", modIndex);
+      });
+
+      taskWrapper.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        taskWrapper.style.border = "1px dashed var(--accent)";
+      });
+
+      taskWrapper.addEventListener("dragleave", () => {
+        taskWrapper.style.border = "";
+      });
+
+      taskWrapper.addEventListener("drop", (e) => {
+        const from = +e.dataTransfer.getData("taskFrom");
+        const moduleIdx = +e.dataTransfer.getData("moduleIndex");
+        const to = +taskWrapper.dataset.index;
+
+        if (moduleIdx === modIndex && from !== to) {
+          const [movedTask] = modules[modIndex].tasks.splice(from, 1);
+          modules[modIndex].tasks.splice(to, 0, movedTask);
+          saveModules();
+          renderModules();
+        }
+      });
+
+      // === Task UI ===
       const taskEl = document.createElement("div");
       taskEl.className = "task";
 
@@ -67,7 +130,9 @@ function renderModules() {
 
       const addSubtaskBtn = document.createElement("button");
       addSubtaskBtn.innerHTML = "+";
+      addSubtaskBtn.title = "Add Subtask";
       addSubtaskBtn.onclick = () => {
+        if (!task.subtasks) task.subtasks = [];
         task.subtasks.push({ text: "", done: false });
         saveModules();
         renderModules();
@@ -84,7 +149,8 @@ function renderModules() {
       taskEl.append(checkbox, taskText, addSubtaskBtn, deleteTaskBtn);
       taskWrapper.appendChild(taskEl);
 
-      // Subtasks (render below)
+      // === Subtasks ===
+      task.subtasks = task.subtasks || [];
       task.subtasks.forEach((sub, subIndex) => {
         const subtaskEl = document.createElement("div");
         subtaskEl.className = "subtask";
@@ -107,23 +173,23 @@ function renderModules() {
           saveModules();
         };
 
-        const deleteSubBtn = document.createElement("button");
-        deleteSubBtn.innerHTML = "❌";
-        deleteSubBtn.className = "delete-btn";
-        deleteSubBtn.onclick = () => {
+        const subDelete = document.createElement("button");
+        subDelete.className = "delete-btn";
+        subDelete.textContent = "✖";
+        subDelete.onclick = () => {
           task.subtasks.splice(subIndex, 1);
           saveModules();
           renderModules();
         };
 
-        subtaskEl.append(subCheck, subText, deleteSubBtn);
+        subtaskEl.append(subCheck, subText, subDelete);
         taskWrapper.appendChild(subtaskEl);
       });
 
       moduleEl.appendChild(taskWrapper);
     });
 
-    // New task input
+    // === Add Task Input ===
     const newTaskInput = document.createElement("input");
     newTaskInput.type = "text";
     newTaskInput.placeholder = "New task...";
@@ -145,6 +211,7 @@ function renderModules() {
   });
 }
 
+// === Button Handlers ===
 addModuleBtn.onclick = () => {
   modules.push({ name: "New Module", tasks: [] });
   saveModules();
@@ -161,6 +228,7 @@ exportBtn.onclick = () => {
     content += `## ${mod.name}\n`;
     mod.tasks.forEach((task) => {
       content += `- [${task.done ? "x" : " "}] ${task.text}\n`;
+      task.subtasks = task.subtasks || [];
       task.subtasks.forEach((sub) => {
         content += `  - [${sub.done ? "x" : " "}] ${sub.text}\n`;
       });
